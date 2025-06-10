@@ -7,7 +7,7 @@ import { DatePicker } from '@/components/ui/date-picker'
 export default function Home() {
   const [eventName, setEventName] = useState('')
   const [location, setLocation] = useState('')
-  const [date, setDate] = useState<Date>()
+  const [date, setDate] = useState<Date | undefined>()
   const [notes, setNotes] = useState('')
   const [setlistText, setSetlistText] = useState('')
   const [message, setMessage] = useState('')
@@ -16,10 +16,12 @@ export default function Home() {
     e.preventDefault()
     setMessage('登録中...')
 
+    const isoDate = date?.toISOString().split('T')[0] // yyyy-mm-dd 形式
+
     // 1. イベントを登録
     const { data: eventData, error: eventError } = await supabase
       .from('events')
-      .insert([{ name: eventName, location, date, notes }])
+      .insert([{ event_name: eventName, location, date: isoDate, notes }])
       .select()
       .single()
 
@@ -89,7 +91,7 @@ export default function Home() {
   const resetForm = () => {
     setEventName('')
     setLocation('')
-    setDate('')
+    setDate(undefined)
     setNotes('')
     setSetlistText('')
   }
@@ -108,7 +110,7 @@ export default function Home() {
         </div>
         <div>
           <label className="block font-semibold">日付</label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full p-2 border rounded" required />
+          <DatePicker date={date} setDate={setDate} />
         </div>
         <div>
           <label className="block font-semibold">備考</label>
