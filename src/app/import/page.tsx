@@ -64,8 +64,10 @@ export default function ImportPage() {
 
     const unmatchedTitles: string[] = []
 
+    const songMap = new Map(songs.map(song => [song.title, song]))
+    
     const inserts = setlistLines.map((title, index) => {
-      const song = songs.find((s) => s.title === title)
+      const song = songMap.get(title)
       if (!song) unmatchedTitles.push(title)
       return song
         ? {
