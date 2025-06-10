@@ -58,8 +58,10 @@ export default function Home() {
     }
 
     // 4. 該当曲がある行だけ setlists に登録
+    const songMap = new Map(songs.map(song => [song.title, song]))
+    
     const inserts = lines.map((title, index) => {
-      const matched = songs.find((s) => s.title === title)
+      const matched = songMap.get(title)
       return matched
         ? {
             event_id: eventId,
