@@ -14,10 +14,10 @@ export default function ImportPage() {
 
     const lines = rawText.split('\n').map((line) => line.trim()).filter(Boolean)
 
-    let dateLine = lines.find((line) => /^\d{4}\.\d{1,2}\.\d{1,2}/.test(line))
-    let eventName = lines[lines.indexOf(dateLine!) + 1] || '無題イベント'
-    let locationLine = lines.find((line) => line.startsWith('@'))
-    let setlistIndex = lines.findIndex((line) => line.startsWith('#'))
+    const dateLine = lines.find((line) => /^\d{4}\.\d{1,2}\.\d{1,2}/.test(line))
+    const eventName = lines[lines.indexOf(dateLine!) + 1] || '無題イベント'
+    const locationLine = lines.find((line) => line.startsWith('@'))
+    const setlistIndex = lines.findIndex((line) => line.startsWith('#'))
 
     const date = dateLine
       ? new Date(dateLine.replace(/[^\d.]/g, '').replace(/\./g, '-'))
@@ -67,12 +67,22 @@ export default function ImportPage() {
     const songMap = new Map(songs.map(song => [song.title, song]))
     
     const inserts = setlistLines.map((title, index) => {
+      if (title.toUpperCase() === 'MC') {
+        return {
+          event_id: eventId,
+          song_id: null,
+          item_type: 'mc',
+          order: index + 1,
+        }
+      }
+      
       const song = songMap.get(title)
       if (!song) unmatchedTitles.push(title)
       return song
         ? {
             event_id: eventId,
             song_id: song.id,
+            item_type: 'song',
             order: index + 1,
           }
         : null

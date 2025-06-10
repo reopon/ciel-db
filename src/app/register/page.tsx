@@ -61,11 +61,21 @@ export default function Home() {
     const songMap = new Map(songs.map(song => [song.title, song]))
     
     const inserts = lines.map((title, index) => {
+      if (title.toUpperCase() === 'MC') {
+        return {
+          event_id: eventId,
+          song_id: null,
+          item_type: 'mc',
+          order: index + 1,
+        }
+      }
+      
       const matched = songMap.get(title)
       return matched
         ? {
             event_id: eventId,
             song_id: matched.id,
+            item_type: 'song',
             order: index + 1,
           }
         : null
