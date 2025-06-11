@@ -194,18 +194,19 @@ export default function EventListPage() {
                   <div className="border-t pt-4">
                     <h3 className="font-semibold mb-3">セットリスト</h3>
                     <ol className="space-y-2">
-                      {event.setlists.map((setlist, index) => (
-                        <li key={index} className="flex items-center">
-                          <span className="text-gray-500 font-mono text-sm w-8">
-                            {setlist.order}.
-                          </span>
-                          {setlist.item_type === 'mc' ? (
-                            <span className="ml-2 italic text-gray-600">MC</span>
-                          ) : (
-                            <span className="ml-2">{setlist.song?.title}</span>
-                          )}
-                        </li>
-                      ))}
+                      {(() => {  
+                        let songNumber = 1;  
+                        return event.setlists.map((setlist, index) => (  
+                          <li key={index} className="flex items-center">  
+                            <span className="text-gray-500 font-mono text-sm w-8">  
+                              {setlist.item_type === 'mc' ? '' : `${songNumber++}.`}  
+                            </span>  
+                            <span className="ml-2">
+                              {setlist.item_type === 'mc' ? 'MC' : setlist.song?.title}  
+                              </span>  
+                          </li>
+                        ));  
+                      })()}
                     </ol>
                   </div>
                 )}

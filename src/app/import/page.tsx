@@ -15,7 +15,17 @@ export default function ImportPage() {
     const lines = rawText.split('\n').map((line) => line.trim()).filter(Boolean)
 
     const dateLine = lines.find((line) => /^\d{4}\.\d{1,2}\.\d{1,2}/.test(line))
-    const eventName = lines[lines.indexOf(dateLine!) + 1] || '無題イベント'
+    // イベント名
+    const dateIndex = lines.indexOf(dateLine!)  
+    const locationIndex = lines.findIndex((line) => line.startsWith('@'))  
+    let eventName = '無題イベント'      
+    if (dateIndex !== -1 && locationIndex !== -1 && locationIndex > dateIndex + 1) {  
+        // 日付行と場所行の間のすべての行を結合
+        eventName = lines.slice(dateIndex + 1, locationIndex).join(' ')  
+    } else if (dateIndex !== -1 && dateIndex + 1 < lines.length) {  
+        // 場所行が見つからない場合は従来通り次の行のみ  
+        eventName = lines[dateIndex + 1]  
+    }
     const locationLine = lines.find((line) => line.startsWith('@'))
     const setlistIndex = lines.findIndex((line) => line.startsWith('#'))
 
