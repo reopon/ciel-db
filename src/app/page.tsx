@@ -17,7 +17,8 @@ interface Event {
   notes?: string
   setlists: Array<{
     order: number
-    song: Song
+    item_type: string
+    song: Song | null
   }>
 }
 
@@ -45,6 +46,7 @@ export default function EventListPage() {
           notes,
           setlists (
             order,
+            item_type,
             songs (
               id,
               title
@@ -64,19 +66,32 @@ export default function EventListPage() {
         return
       }
 
-      const transformedEvents: Event[] = eventsData.map((event: any) => ({
+      interface EventData {
+        id: number
+        event_name: string
+        location: string
+        date: string
+        notes?: string
+        setlists: Array<{
+          order: number
+          item_type: string
+          songs: Song | null
+        }>
+      }
+
+      const transformedEvents: Event[] = (eventsData as unknown as EventData[]).map((event) => ({
         id: event.id,
         event_name: event.event_name,
         location: event.location,
         date: event.date,
         notes: event.notes,
         setlists: (event.setlists || [])
-          .map((setlist: any) => ({
+          .map((setlist) => ({
             order: setlist.order,
+            item_type: setlist.item_type,
             song: setlist.songs
           }))
-          .filter((setlist: any) => setlist.song)
-          .sort((a: any, b: any) => a.order - b.order)
+          .sort((a, b) => a.order - b.order)
       }))
 
       setEvents(transformedEvents)
@@ -184,7 +199,11 @@ export default function EventListPage() {
                           <span className="text-gray-500 font-mono text-sm w-8">
                             {setlist.order}.
                           </span>
-                          <span className="ml-2">{setlist.song.title}</span>
+                          {setlist.item_type === 'mc' ? (
+                            <span className="ml-2 italic text-gray-600">MC</span>
+                          ) : (
+                            <span className="ml-2">{setlist.song?.title}</span>
+                          )}
                         </li>
                       ))}
                     </ol>
