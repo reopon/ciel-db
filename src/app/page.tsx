@@ -330,23 +330,23 @@ export default function EventListPage() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="font-medium text-gray-600">作詞:</span>
-                  <span>{songDetails.song.lyricist || '不明'}</span>
+                  <span>{songDetails.song.lyricist || ''}</span>
                 </div>
                 
                 <div className="flex justify-between">
                   <span className="font-medium text-gray-600">作曲:</span>
-                  <span>{songDetails.song.composer || '不明'}</span>
+                  <span>{songDetails.song.composer || ''}</span>
                 </div>
                 
                 <div className="flex justify-between">
                   <span className="font-medium text-gray-600">編曲:</span>
-                  <span>{songDetails.song.arranger || '不明'}</span>
+                  <span>{songDetails.song.arranger || ''}</span>
                 </div>
                 
                 <div className="flex justify-between border-t pt-2">
-                  <span className="font-medium text-gray-600">やった回数:</span>
-                  <span className="font-semibold text-blue-600">
-                    {songDetails.performanceCount}回
+                  <span className="font-medium text-gray-600">回数:</span>
+                  <span className="font-semibold text-gray-600">
+                    {songDetails.performanceCount}回 （since 2025.06.01）
                   </span>
                 </div>
               </div>
