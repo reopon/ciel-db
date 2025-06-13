@@ -345,7 +345,7 @@ export default function EventListPage() {
                 <div className="flex justify-between border-t pt-2">
                   <span className="font-medium text-gray-600">回数:</span>
                   <span className="font-semibold text-gray-600">
-                    {songDetails.performanceCount}回 （since 2025.06.01）
+                    {songDetails.performanceCount}回
                   </span>
                 </div>
               </div>
