@@ -32,7 +32,6 @@ export default function EventListPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [expandedEvents, setExpandedEvents] = useState<Set<number>>(new Set())
-  const [selectedSong, setSelectedSong] = useState<Song | null>(null)
   const [songDetails, setSongDetails] = useState<{
     song: Song
     performanceCount: number
