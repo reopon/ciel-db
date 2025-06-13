@@ -18,6 +18,7 @@ interface Event {
   setlists: Array<{
     order: number
     item_type: string
+    notes?: string
     song: Song | null
   }>
 }
@@ -47,6 +48,7 @@ export default function EventListPage() {
           setlists (
             order,
             item_type,
+            notes,
             songs (
               id,
               title
@@ -75,6 +77,7 @@ export default function EventListPage() {
         setlists: Array<{
           order: number
           item_type: string
+          notes?: string
           songs: Song | null
         }>
       }
@@ -89,6 +92,7 @@ export default function EventListPage() {
           .map((setlist) => ({
             order: setlist.order,
             item_type: setlist.item_type,
+            notes: setlist.notes,
             song: setlist.songs
           }))
           .sort((a, b) => a.order - b.order)
@@ -202,7 +206,12 @@ export default function EventListPage() {
                               {setlist.item_type === 'mc' ? '' : `${songNumber++}.`}
                             </span>
                             <span className="ml-2">
-                              {setlist.item_type === 'mc' ? 'MC' : setlist.song?.title}
+                              {setlist.item_type === 'mc' ? '' : setlist.song?.title}
+                              {setlist.notes && (
+                                <span className="ml-2 text-gray-500 text-sm">
+                                  {setlist.notes}
+                                </span>
+                              )}
                             </span>
                           </li>
                         ));
