@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { format } from 'date-fns'  
 
 export default function ImportPage() {
   const [rawText, setRawText] = useState('')
@@ -43,7 +44,7 @@ export default function ImportPage() {
       return
     }
 
-    const isoDate = date.toISOString().split('T')[0]
+    const isoDate = format(date, 'yyyy-MM-dd')
 
     // イベントを登録
     const { data: eventData, error: eventError } = await supabase

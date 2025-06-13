@@ -35,7 +35,7 @@ export default function EventListPage() {
   const fetchEvents = async () => {
     try {
       setLoading(true)
-      
+
       const { data: eventsData, error: eventsError } = await supabase
         .from('events')
         .select(`
@@ -149,7 +149,7 @@ export default function EventListPage() {
   return (
     <main className="max-w-4xl mx-auto mt-10 p-6 space-y-6">
       <h1 className="text-3xl font-bold text-center mb-8">Gran☆Ciel イベント一覧</h1>
-      
+
       {events.length === 0 ? (
         <div className="text-center text-gray-600">
           <p className="text-lg">まだイベントが登録されていません</p>
@@ -159,8 +159,8 @@ export default function EventListPage() {
           {events.map((event) => (
             <div key={event.id} className="border rounded-lg shadow-sm bg-white">
               <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4">
+                  <div className="flex-1 mb-4 sm:mb-0">
                     <h2 className="text-xl font-semibold mb-2">{event.event_name}</h2>
                     <div className="text-gray-600 space-y-1">
                       <p className="flex items-center">
@@ -183,7 +183,7 @@ export default function EventListPage() {
                     <Button
                       variant="outline"
                       onClick={() => toggleEventExpansion(event.id)}
-                      className="ml-4"
+                      className="w-full sm:w-auto sm:ml-4"
                     >
                       {expandedEvents.has(event.id) ? 'セットリストを隠す' : 'セットリストを表示'}
                     </Button>
@@ -194,18 +194,18 @@ export default function EventListPage() {
                   <div className="border-t pt-4">
                     <h3 className="font-semibold mb-3">セットリスト</h3>
                     <ol className="space-y-2">
-                      {(() => {  
-                        let songNumber = 1;  
-                        return event.setlists.map((setlist, index) => (  
-                          <li key={index} className="flex items-center">  
-                            <span className="text-gray-500 font-mono text-sm w-8">  
-                              {setlist.item_type === 'mc' ? '' : `${songNumber++}.`}  
-                            </span>  
+                      {(() => {
+                        let songNumber = 1;
+                        return event.setlists.map((setlist, index) => (
+                          <li key={index} className="flex items-center">
+                            <span className="text-gray-500 font-mono text-sm w-8">
+                              {setlist.item_type === 'mc' ? '' : `${songNumber++}.`}
+                            </span>
                             <span className="ml-2">
-                              {setlist.item_type === 'mc' ? 'MC' : setlist.song?.title}  
-                              </span>  
+                              {setlist.item_type === 'mc' ? 'MC' : setlist.song?.title}
+                            </span>
                           </li>
-                        ));  
+                        ));
                       })()}
                     </ol>
                   </div>
