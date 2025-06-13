@@ -3,10 +3,14 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 interface Song {
   id: number
   title: string
+  lyricist?: string
+  composer?: string
+  arranger?: string
 }
 
 interface Event {
@@ -28,6 +32,12 @@ export default function EventListPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [expandedEvents, setExpandedEvents] = useState<Set<number>>(new Set())
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null)
+  const [songDetails, setSongDetails] = useState<{
+    song: Song
+    performanceCount: number
+  } | null>(null)
+  const [showSongModal, setShowSongModal] = useState(false)
 
   useEffect(() => {
     fetchEvents()
@@ -51,7 +61,10 @@ export default function EventListPage() {
             notes,
             songs (
               id,
-              title
+              title,
+              lyricist,
+              composer,
+              arranger
             )
           )
         `)
@@ -125,6 +138,42 @@ export default function EventListPage() {
       day: 'numeric',
       weekday: 'short'
     })
+  }
+
+  const fetchSongDetails = async (song: Song) => {
+    try {
+      const { data: performanceData, error: performanceError } = await supabase
+        .from('setlists')
+        .select('id')
+        .eq('song_id', song.id)
+
+      if (performanceError) {
+        console.error(performanceError)
+        return
+      }
+
+      const performanceCount = performanceData?.length || 0
+
+      setSongDetails({
+        song,
+        performanceCount
+      })
+      setShowSongModal(true)
+    } catch (err) {
+      console.error('Failed to fetch song details:', err)
+    }
+  }
+
+  const handleSongClick = (song: Song) => {
+    if (song) {
+      fetchSongDetails(song)
+    }
+  }
+
+  const handleSongLongPress = (song: Song) => {
+    if (song) {
+      fetchSongDetails(song)
+    }
   }
 
   if (loading) {
@@ -206,7 +255,42 @@ export default function EventListPage() {
                               {setlist.item_type === 'mc' ? '' : `${songNumber++}.`}
                             </span>
                             <span className="ml-2">
-                              {setlist.item_type === 'mc' ? '' : setlist.song?.title}
+                              {setlist.item_type === 'mc' ? '' : (
+                                <span
+                                  className="cursor-pointer hover:text-blue-600 hover:underline"
+                                  onClick={() => setlist.song && handleSongClick(setlist.song)}
+                                  onTouchStart={(e) => {
+                                    if (setlist.song) {
+                                      const touchTimer = setTimeout(() => {
+                                        handleSongLongPress(setlist.song!)
+                                      }, 500)
+                                      e.currentTarget.dataset.touchTimer = touchTimer.toString()
+                                    }
+                                  }}
+                                  onTouchEnd={(e) => {
+                                    const touchTimer = e.currentTarget.dataset.touchTimer
+                                    if (touchTimer) {
+                                      clearTimeout(parseInt(touchTimer))
+                                      delete e.currentTarget.dataset.touchTimer
+                                    }
+                                  }}
+                                  onTouchCancel={(e) => {
+                                    const touchTimer = e.currentTarget.dataset.touchTimer
+                                    if (touchTimer) {
+                                      clearTimeout(parseInt(touchTimer))
+                                      delete e.currentTarget.dataset.touchTimer
+                                    }
+                                  }}
+                                  onContextMenu={(e) => {
+                                    e.preventDefault()
+                                    if (setlist.song) {
+                                      handleSongLongPress(setlist.song)
+                                    }
+                                  }}
+                                >
+                                  {setlist.song?.title}
+                                </span>
+                              )}
                               {setlist.notes && (
                                 <span className="ml-2 text-gray-500 text-sm">
                                   {setlist.notes}
@@ -230,6 +314,55 @@ export default function EventListPage() {
           ))}
         </div>
       )}
+
+      {/* Song Details Modal */}
+      <Popover open={showSongModal} onOpenChange={setShowSongModal}>
+        <PopoverTrigger asChild>
+          <div style={{ display: 'none' }} />
+        </PopoverTrigger>
+        <PopoverContent className="w-80 p-4">
+          {songDetails && (
+            <div className="space-y-3">
+              <h3 className="font-semibold text-lg border-b pb-2">
+                {songDetails.song.title}
+              </h3>
+              
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="font-medium text-gray-600">作詞:</span>
+                  <span>{songDetails.song.lyricist || '不明'}</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span className="font-medium text-gray-600">作曲:</span>
+                  <span>{songDetails.song.composer || '不明'}</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span className="font-medium text-gray-600">編曲:</span>
+                  <span>{songDetails.song.arranger || '不明'}</span>
+                </div>
+                
+                <div className="flex justify-between border-t pt-2">
+                  <span className="font-medium text-gray-600">やった回数:</span>
+                  <span className="font-semibold text-blue-600">
+                    {songDetails.performanceCount}回
+                  </span>
+                </div>
+              </div>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full mt-3"
+                onClick={() => setShowSongModal(false)}
+              >
+                閉じる
+              </Button>
+            </div>
+          )}
+        </PopoverContent>
+      </Popover>
     </main>
   )
 }
