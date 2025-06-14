@@ -122,16 +122,6 @@ export default function EventListPage() {
     }
   }
 
-  const toggleEventExpansion = (eventId: number) => {
-    const newExpanded = new Set(expandedEvents)
-    if (newExpanded.has(eventId)) {
-      newExpanded.delete(eventId)
-    } else {
-      newExpanded.add(eventId)
-    }
-    setExpandedEvents(newExpanded)
-  }
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('ja-JP', {
