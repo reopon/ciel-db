@@ -234,10 +234,10 @@ export default function EventListPage() {
                         return event.setlists.map((setlist, index) => (
                           <li key={index} className="flex items-center">
                             <span className="text-gray-500 font-mono text-sm w-8">
-                              {setlist.item_type === 'mc' ? '' : `${songNumber++}.`}
+                              {setlist.item_type === 'other' ? '' : `${songNumber++}.`}
                             </span>
                             <span className="ml-2">
-                              {setlist.item_type === 'mc' ? '' : (
+                              {setlist.item_type === 'other' ? '' : (
                                 <span
                                   className="cursor-pointer hover:text-blue-600 hover:underline"
                                   onClick={() => setlist.song && handleSongClick(setlist.song)}
