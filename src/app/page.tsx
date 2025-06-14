@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { CalendarIcon, MapPinIcon, StickyNoteIcon } from 'lucide-react'
 
 interface Song {
@@ -317,16 +317,15 @@ export default function EventListPage() {
       )}
 
       {/* Song Details Modal */}
-      <Popover open={showSongModal} onOpenChange={setShowSongModal}>
-        <PopoverTrigger asChild>
-          <div style={{ display: 'none' }} />
-        </PopoverTrigger>
-        <PopoverContent className="w-80 p-4 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        {songDetails && (
+      <Dialog open={showSongModal} onOpenChange={setShowSongModal}>
+        <DialogContent className="w-80">
+          {songDetails && (
             <div className="space-y-3">
-              <h3 className="font-semibold text-lg border-b pb-2">
-                {songDetails.song.title}
-              </h3>
+              <DialogHeader>
+                <DialogTitle className="border-b pb-2">
+                  {songDetails.song.title}
+                </DialogTitle>
+              </DialogHeader>
 
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -355,8 +354,8 @@ export default function EventListPage() {
               </Button>
             </div>
           )}
-        </PopoverContent>
-      </Popover>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }
