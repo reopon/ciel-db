@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { CalendarIcon, MapPinIcon, StickyNoteIcon } from 'lucide-react'
 
 interface Song {
   id: number
@@ -111,6 +112,8 @@ export default function EventListPage() {
       }))
 
       setEvents(transformedEvents)
+      const allEventIds = new Set(transformedEvents.map(event => event.id))  
+      setExpandedEvents(allEventIds)
     } catch (err) {
       console.error(err)
       setError('予期しないエラーが発生しました')
@@ -200,7 +203,7 @@ export default function EventListPage() {
 
   return (
     <main className="max-w-4xl mx-auto mt-10 p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-center mb-8">Gran☆Ciel イベント一覧</h1>
+      <h1 className="text-3xl font-bold text-center mb-8">Gran☆Ciel</h1>
 
       {events.length === 0 ? (
         <div className="text-center text-gray-600">
@@ -216,16 +219,16 @@ export default function EventListPage() {
                     <h2 className="text-xl font-semibold mb-2">{event.event_name}</h2>
                     <div className="text-gray-600 space-y-1">
                       <p className="flex items-center">
-                        <span className="font-medium">日時:</span>
+                        <CalendarIcon className="h-4 w-4 mr-2" />
                         <span className="ml-2">{formatDate(event.date)}</span>
                       </p>
                       <p className="flex items-center">
-                        <span className="font-medium">会場:</span>
+                        <MapPinIcon className="h-4 w-4 mr-2" />
                         <span className="ml-2">{event.location}</span>
                       </p>
                       {event.notes && (
                         <p className="flex items-start">
-                          <span className="font-medium">備考:</span>
+                          <StickyNoteIcon className="h-4 w-4 mr-2" />
                           <span className="ml-2">{event.notes}</span>
                         </p>
                       )}
@@ -237,14 +240,13 @@ export default function EventListPage() {
                       onClick={() => toggleEventExpansion(event.id)}
                       className="w-full sm:w-auto sm:ml-4"
                     >
-                      {expandedEvents.has(event.id) ? 'セットリストを隠す' : 'セットリストを表示'}
+                      {expandedEvents.has(event.id) ? 'close' : 'open'}
                     </Button>
                   )}
                 </div>
 
                 {event.setlists.length > 0 && expandedEvents.has(event.id) && (
                   <div className="border-t pt-4">
-                    <h3 className="font-semibold mb-3">セットリスト</h3>
                     <ol className="space-y-2">
                       {(() => {
                         let songNumber = 1;
@@ -319,40 +321,33 @@ export default function EventListPage() {
         <PopoverTrigger asChild>
           <div style={{ display: 'none' }} />
         </PopoverTrigger>
-        <PopoverContent className="w-80 p-4">
-          {songDetails && (
+        <PopoverContent className="w-80 p-4 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        {songDetails && (
             <div className="space-y-3">
               <h3 className="font-semibold text-lg border-b pb-2">
                 {songDetails.song.title}
               </h3>
-              
+
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="font-medium text-gray-600">作詞:</span>
                   <span>{songDetails.song.lyricist || ''}</span>
                 </div>
-                
+
                 <div className="flex justify-between">
                   <span className="font-medium text-gray-600">作曲:</span>
                   <span>{songDetails.song.composer || ''}</span>
                 </div>
-                
+
                 <div className="flex justify-between">
                   <span className="font-medium text-gray-600">編曲:</span>
                   <span>{songDetails.song.arranger || ''}</span>
                 </div>
-                
-                <div className="flex justify-between border-t pt-2">
-                  <span className="font-medium text-gray-600">回数:</span>
-                  <span className="font-semibold text-gray-600">
-                    {songDetails.performanceCount}回
-                  </span>
-                </div>
               </div>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
+
+              <Button
+                variant="outline"
+                size="sm"
                 className="w-full mt-3"
                 onClick={() => setShowSongModal(false)}
               >
