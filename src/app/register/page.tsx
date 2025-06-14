@@ -61,26 +61,24 @@ export default function Home() {
     const songMap = new Map(songs.map(song => [song.title, song]))
     
     const inserts = lines.map((title, index) => {
-
-      if (title.toUpperCase() === 'MC') {
+      const matched = songMap.get(title)
+      if (matched) {
+        return {
+          event_id: eventId,
+          song_id: matched.id,
+          item_type: 'song',
+          order: index + 1,
+        }
+      } else {
         return {
           event_id: eventId,
           song_id: null,
-          item_type: 'mc',
+          item_type: 'other',
           order: index + 1,
+          notes: title,
         }
       }
-      
-      const matched = songMap.get(title)
-      return matched
-        ? {
-            event_id: eventId,
-            song_id: matched.id,
-            item_type: 'song',
-            order: index + 1,
-          }
-        : null
-    }).filter(Boolean)
+    })
 
     if (inserts.length > 0) {
       const { error: setlistsError } = await supabase
@@ -94,9 +92,6 @@ export default function Home() {
       }
 
       setMessage('イベント＋セットリストの登録に成功しました！🎉')
-
-    } else {
-      setMessage('イベント登録成功！ただしセットリストに一致する曲が見つかりませんでした')
     }
 
     resetForm()
