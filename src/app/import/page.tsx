@@ -7,6 +7,7 @@ import { format } from 'date-fns'
 export default function ImportPage() {
   const [rawText, setRawText] = useState('')
   const [message, setMessage] = useState('')
+
   const [unmatched, setUnmatched] = useState<string[]>([])
 
   const handleImport = async () => {
@@ -73,11 +74,13 @@ export default function ImportPage() {
       return
     }
 
+
     const unmatchedTitles: string[] = []
 
     const songMap = new Map(songs.map(song => [song.title, song]))
     
     const inserts = setlistLines.map((title, index) => {
+
       if (title.toUpperCase() === 'MC') {
         return {
           event_id: eventId,
@@ -99,6 +102,7 @@ export default function ImportPage() {
         : null
     }).filter(Boolean)
 
+
     if (inserts.length > 0) {
       const { error: setlistError } = await supabase
         .from('setlists')
@@ -110,6 +114,7 @@ export default function ImportPage() {
         return
       }
     }
+
 
     setUnmatched(unmatchedTitles)
 
@@ -141,6 +146,7 @@ export default function ImportPage() {
       </button>
 
       {message && <p className="text-green-700 whitespace-pre-wrap">{message}</p>}
+
 
       {unmatched.length > 0 && (
         <div className="mt-4 text-red-600">

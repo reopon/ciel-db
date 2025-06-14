@@ -61,6 +61,7 @@ export default function Home() {
     const songMap = new Map(songs.map(song => [song.title, song]))
     
     const inserts = lines.map((title, index) => {
+
       if (title.toUpperCase() === 'MC') {
         return {
           event_id: eventId,
@@ -93,6 +94,7 @@ export default function Home() {
       }
 
       setMessage('イベント＋セットリストの登録に成功しました！🎉')
+
     } else {
       setMessage('イベント登録成功！ただしセットリストに一致する曲が見つかりませんでした')
     }
