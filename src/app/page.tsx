@@ -122,16 +122,6 @@ export default function EventListPage() {
     }
   }
 
-  const toggleEventExpansion = (eventId: number) => {
-    const newExpanded = new Set(expandedEvents)
-    if (newExpanded.has(eventId)) {
-      newExpanded.delete(eventId)
-    } else {
-      newExpanded.add(eventId)
-    }
-    setExpandedEvents(newExpanded)
-  }
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('ja-JP', {
@@ -234,15 +224,6 @@ export default function EventListPage() {
                       )}
                     </div>
                   </div>
-                  {event.setlists.length > 0 && (
-                    <Button
-                      variant="outline"
-                      onClick={() => toggleEventExpansion(event.id)}
-                      className="w-full sm:w-auto sm:ml-4"
-                    >
-                      {expandedEvents.has(event.id) ? 'close' : 'open'}
-                    </Button>
-                  )}
                 </div>
 
                 {event.setlists.length > 0 && expandedEvents.has(event.id) && (
@@ -305,11 +286,6 @@ export default function EventListPage() {
                   </div>
                 )}
 
-                {event.setlists.length === 0 && (
-                  <div className="border-t pt-4 text-gray-500 text-center">
-                    <p>セットリスト情報がありません</p>
-                  </div>
-                )}
               </div>
             </div>
           ))}
