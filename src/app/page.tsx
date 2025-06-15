@@ -112,7 +112,7 @@ export default function EventListPage() {
       }))
 
       setEvents(transformedEvents)
-      const allEventIds = new Set(transformedEvents.map(event => event.id))  
+      const allEventIds = new Set(transformedEvents.map(event => event.id))
       setExpandedEvents(allEventIds)
     } catch (err) {
       console.error(err)
@@ -157,12 +157,6 @@ export default function EventListPage() {
   }
 
   const handleSongClick = (song: Song) => {
-    if (song) {
-      fetchSongDetails(song)
-    }
-  }
-
-  const handleSongLongPress = (song: Song) => {
     if (song) {
       fetchSongDetails(song)
     }
@@ -234,41 +228,13 @@ export default function EventListPage() {
                         return event.setlists.map((setlist, index) => (
                           <li key={index} className="flex items-center">
                             <span className="text-gray-500 font-mono text-sm w-8">
-                              {setlist.item_type === 'mc' ? '' : `${songNumber++}.`}
+                              {setlist.item_type === 'other' ? '' : `${songNumber++}.`}
                             </span>
                             <span className="ml-2">
-                              {setlist.item_type === 'mc' ? '' : (
+                              {setlist.item_type === 'other' ? '' : (
                                 <span
-                                  className="cursor-pointer hover:text-blue-600 hover:underline"
+                                  className="cursor-pointer hover:text-blue-800"
                                   onClick={() => setlist.song && handleSongClick(setlist.song)}
-                                  onTouchStart={(e) => {
-                                    if (setlist.song) {
-                                      const touchTimer = setTimeout(() => {
-                                        handleSongLongPress(setlist.song!)
-                                      }, 500)
-                                      e.currentTarget.dataset.touchTimer = touchTimer.toString()
-                                    }
-                                  }}
-                                  onTouchEnd={(e) => {
-                                    const touchTimer = e.currentTarget.dataset.touchTimer
-                                    if (touchTimer) {
-                                      clearTimeout(parseInt(touchTimer))
-                                      delete e.currentTarget.dataset.touchTimer
-                                    }
-                                  }}
-                                  onTouchCancel={(e) => {
-                                    const touchTimer = e.currentTarget.dataset.touchTimer
-                                    if (touchTimer) {
-                                      clearTimeout(parseInt(touchTimer))
-                                      delete e.currentTarget.dataset.touchTimer
-                                    }
-                                  }}
-                                  onContextMenu={(e) => {
-                                    e.preventDefault()
-                                    if (setlist.song) {
-                                      handleSongLongPress(setlist.song)
-                                    }
-                                  }}
                                 >
                                   {setlist.song?.title}
                                 </span>

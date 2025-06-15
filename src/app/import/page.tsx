@@ -7,11 +7,9 @@ import { format } from 'date-fns'
 export default function ImportPage() {
   const [rawText, setRawText] = useState('')
   const [message, setMessage] = useState('')
-  const [unmatched, setUnmatched] = useState<string[]>([])
 
   const handleImport = async () => {
     setMessage('登録中...')
-    setUnmatched([])
 
     const lines = rawText.split('\n').map((line) => line.trim()).filter(Boolean)
 
@@ -73,31 +71,29 @@ export default function ImportPage() {
       return
     }
 
-    const unmatchedTitles: string[] = []
 
     const songMap = new Map(songs.map(song => [song.title, song]))
     
     const inserts = setlistLines.map((title, index) => {
-      if (title.toUpperCase() === 'MC') {
+      const song = songMap.get(title)
+      if (song) {
+        return {
+          event_id: eventId,
+          song_id: song.id,
+          item_type: 'song',
+          order: index + 1,
+        }
+      } else {
         return {
           event_id: eventId,
           song_id: null,
-          item_type: 'mc',
+          item_type: 'other',
           order: index + 1,
+          notes: title,
         }
       }
-      
-      const song = songMap.get(title)
-      if (!song) unmatchedTitles.push(title)
-      return song
-        ? {
-            event_id: eventId,
-            song_id: song.id,
-            item_type: 'song',
-            order: index + 1,
-          }
-        : null
-    }).filter(Boolean)
+    })
+
 
     if (inserts.length > 0) {
       const { error: setlistError } = await supabase
@@ -111,13 +107,7 @@ export default function ImportPage() {
       }
     }
 
-    setUnmatched(unmatchedTitles)
-
-    if (unmatchedTitles.length > 0) {
-      setMessage('登録完了（一部の曲は登録できませんでした）')
-    } else {
-      setMessage('登録完了しました！🎉')
-    }
+    setMessage('登録完了しました！🎉')
 
     setRawText('')
   }
@@ -141,17 +131,6 @@ export default function ImportPage() {
       </button>
 
       {message && <p className="text-green-700 whitespace-pre-wrap">{message}</p>}
-
-      {unmatched.length > 0 && (
-        <div className="mt-4 text-red-600">
-          <p className="font-semibold">以下の曲は songs テーブルに見つかりませんでした：</p>
-          <ul className="list-disc list-inside">
-            {unmatched.map((title, i) => (
-              <li key={i}>{title}</li>
-            ))}
-          </ul>
-        </div>
-      )}
     </main>
   )
 }
