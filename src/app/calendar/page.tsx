@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
+import { DayButton } from 'react-day-picker'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { CalendarIcon, MapPinIcon } from 'lucide-react'
 
@@ -141,14 +142,7 @@ export default function CalendarPage() {
     })
   }
 
-  const handleEventClick = (event: Event) => {
-    if (event.setlists.length > 0) {
-      setSelectedEvent(event)
-      setShowEventModal(true)
-    }
-  }
-
-  const CustomDayButton = ({ day, modifiers, ...props }: any) => {
+  const CustomDayButton = ({ day, modifiers, ...props }: React.ComponentProps<typeof DayButton>) => {
     const dateKey = day.date.toISOString().split('T')[0]
     const dayEvents = eventsByDate[dateKey] || []
     
@@ -176,7 +170,7 @@ export default function CalendarPage() {
     }
 
     return (
-      <div
+      <button
         className={`
           flex flex-col items-center justify-start h-auto min-h-[80px] p-2 text-xs leading-tight border-0 bg-transparent
           ${modifiers.selected ? 'bg-primary text-primary-foreground' : ''}
@@ -189,7 +183,7 @@ export default function CalendarPage() {
       >
         <div className="font-medium text-sm mb-1">{day.date.getDate()}</div>
         <div className="flex flex-col gap-1 w-full">
-          {dayEvents.slice(0, 2).map((event, index) => {
+          {dayEvents.slice(0, 2).map((event) => {
             const hasSetlist = event.setlists.length > 0
             const isPast = new Date(event.date) < new Date()
             const isClickable = hasSetlist && isPast
@@ -211,7 +205,7 @@ export default function CalendarPage() {
             <div className="text-[8px] text-gray-500 text-center">+{dayEvents.length - 2} more</div>
           )}
         </div>
-      </div>
+      </button>
     )
   }
 
