@@ -3,10 +3,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
-import { DayButton } from 'react-day-picker'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { CalendarIcon, MapPinIcon } from 'lucide-react'
+import { CalendarIcon, MapPinIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 
 interface Song {
   id: number
@@ -142,71 +140,30 @@ export default function CalendarPage() {
     })
   }
 
-  const CustomDayButton = ({ day, modifiers, ...props }: React.ComponentProps<typeof DayButton>) => {
-    const dateKey = day.date.toISOString().split('T')[0]
-    const dayEvents = eventsByDate[dateKey] || []
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const daysInMonth = new Date(year, month + 1, 0).getDate()
+    const days = []
     
-    const handleDayClick = (e: React.MouseEvent) => {
-      e.preventDefault()
-      if (dayEvents.length === 1) {
-        const event = dayEvents[0]
-        const hasSetlist = event.setlists.length > 0
-        const isPast = new Date(event.date) < new Date()
-        if (hasSetlist && isPast) {
-          setSelectedEvent(event)
-          setShowEventModal(true)
-        }
-      } else if (dayEvents.length > 1) {
-        const clickableEvent = dayEvents.find(event => {
-          const hasSetlist = event.setlists.length > 0
-          const isPast = new Date(event.date) < new Date()
-          return hasSetlist && isPast
-        })
-        if (clickableEvent) {
-          setSelectedEvent(clickableEvent)
-          setShowEventModal(true)
-        }
-      }
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dayDate = new Date(year, month, day)
+      days.push(dayDate)
     }
+    
+    return days
+  }
 
-    return (
-      <button
-        className={`
-          flex flex-col items-center justify-start h-auto min-h-[80px] p-2 text-xs leading-tight border-0 bg-transparent
-          ${modifiers.selected ? 'bg-primary text-primary-foreground' : ''}
-          ${modifiers.today ? 'bg-accent text-accent-foreground font-bold' : ''}
-          ${modifiers.outside ? 'text-muted-foreground opacity-50' : ''}
-          ${dayEvents.length > 0 ? 'cursor-pointer hover:bg-gray-50' : ''}
-        `}
-        onClick={dayEvents.length > 0 ? handleDayClick : undefined}
-        {...props}
-      >
-        <div className="font-medium text-sm mb-1">{day.date.getDate()}</div>
-        <div className="flex flex-col gap-1 w-full">
-          {dayEvents.slice(0, 2).map((event) => {
-            const hasSetlist = event.setlists.length > 0
-            const isPast = new Date(event.date) < new Date()
-            const isClickable = hasSetlist && isPast
-            
-            return (
-              <div
-                key={event.id}
-                className={`
-                  text-[9px] truncate w-full px-1 py-0.5 rounded text-center leading-tight
-                  ${isClickable ? 'text-blue-600 bg-blue-50 hover:bg-blue-100' : 'text-gray-600 bg-gray-100'}
-                `}
-                title={event.event_name}
-              >
-                {event.event_name.length > 15 ? event.event_name.substring(0, 15) + '...' : event.event_name}
-              </div>
-            )
-          })}
-          {dayEvents.length > 2 && (
-            <div className="text-[8px] text-gray-500 text-center">+{dayEvents.length - 2} more</div>
-          )}
-        </div>
-      </button>
-    )
+  const goToPreviousMonth = () => {
+    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))
+  }
+
+  const goToNextMonth = () => {
+    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))
+  }
+
+  const formatMonthYear = (date: Date) => {
+    return date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' })
   }
 
   if (loading) {
@@ -236,17 +193,93 @@ export default function CalendarPage() {
     <main className="max-w-4xl mx-auto mt-10 p-6 space-y-8">
       <h1 className="text-3xl font-bold text-center mb-8">Gran☆Ciel Calendar</h1>
 
-      <div className="flex justify-center">
-        <Calendar
-          mode="single"
-          month={currentMonth}
-          onMonthChange={setCurrentMonth}
-          showOutsideDays={true}
-          components={{
-            DayButton: CustomDayButton
-          }}
-          className="rounded-md border shadow"
-        />
+      <div className="space-y-6">
+        <div className="flex items-center justify-between bg-white rounded-lg border shadow-sm p-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={goToPreviousMonth}
+            className="h-8 w-8"
+          >
+            <ChevronLeftIcon className="h-4 w-4" />
+          </Button>
+          
+          <h2 className="text-xl font-semibold">
+            {formatMonthYear(currentMonth)}
+          </h2>
+          
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={goToNextMonth}
+            className="h-8 w-8"
+          >
+            <ChevronRightIcon className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="space-y-2">
+          {getDaysInMonth(currentMonth).map((dayDate) => {
+            const dateKey = dayDate.toISOString().split('T')[0]
+            const dayEvents = eventsByDate[dateKey] || []
+            const isToday = dayDate.toDateString() === new Date().toDateString()
+            
+            return (
+              <div
+                key={dateKey}
+                className={`flex items-start gap-4 p-4 rounded-lg border ${
+                  isToday ? 'bg-accent border-accent-foreground/20' : 'bg-white'
+                }`}
+              >
+                <div className="flex-shrink-0 w-16 text-center">
+                  <div className={`text-2xl font-bold ${isToday ? 'text-accent-foreground' : 'text-gray-900'}`}>
+                    {dayDate.getDate()}
+                  </div>
+                  <div className="text-xs text-gray-500 uppercase">
+                    {dayDate.toLocaleDateString('ja-JP', { weekday: 'short' })}
+                  </div>
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  {dayEvents.length > 0 ? (
+                    <div className="space-y-2">
+                      {dayEvents.map((event) => {
+                        const hasSetlist = event.setlists.length > 0
+                        const isPast = new Date(event.date) < new Date()
+                        const isClickable = hasSetlist && isPast
+                        
+                        return (
+                          <div
+                            key={event.id}
+                            className={`p-3 rounded-md cursor-pointer transition-colors ${
+                              isClickable 
+                                ? 'text-blue-600 bg-blue-50 hover:bg-blue-100' 
+                                : 'text-gray-700 bg-gray-50'
+                            }`}
+                            onClick={() => {
+                              if (isClickable) {
+                                setSelectedEvent(event)
+                                setShowEventModal(true)
+                              }
+                            }}
+                          >
+                            <div className="font-medium">{event.event_name}</div>
+                            <div className="text-sm text-gray-600 flex items-center mt-1">
+                              <MapPinIcon className="h-3 w-3 mr-1" />
+                              {event.location}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-gray-400 italic">イベントなし</div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </div>
 
       <Dialog open={showEventModal} onOpenChange={setShowEventModal}>
