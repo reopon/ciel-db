@@ -220,7 +220,7 @@ export default function CalendarPage() {
 
         <div className="space-y-2">
           {getDaysInMonth(currentMonth).map((dayDate) => {
-            const dateKey = dayDate.toISOString().split('T')[0]
+            const dateKey = `${dayDate.getFullYear()}-${String(dayDate.getMonth() + 1).padStart(2, '0')}-${String(dayDate.getDate()).padStart(2, '0')}`
             const dayEvents = eventsByDate[dateKey] || []
             const isToday = dayDate.toDateString() === new Date().toDateString()
             
