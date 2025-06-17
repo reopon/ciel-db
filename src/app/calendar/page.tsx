@@ -315,9 +315,7 @@ export default function CalendarPage() {
                             {setlist.item_type === 'other' ? '' : `${songNumber++}.`}
                           </span>
                           <span className="ml-2">
-                            {setlist.item_type === 'other' ? (
-                              <span className="text-gray-500 italic">MC</span>
-                            ) : (
+                            {setlist.item_type === 'song' && (
                               <span>{setlist.song?.title}</span>
                             )}
                             {setlist.notes && (
