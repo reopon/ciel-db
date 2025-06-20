@@ -54,6 +54,7 @@ export default function SongsPage() {
       console.error('Error fetching events:', error);
       setEvents([]);
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const flattened = data.map((row: any) => row.event_id).filter(Boolean);
       flattened.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
       setEvents(flattened);
