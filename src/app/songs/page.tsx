@@ -48,14 +48,14 @@ export default function SongsPage() {
     const { data, error } = await supabase
       .from('setlists')
       .select('event_id(id, event_name, date, location)')
-      .eq('song_id', song.id)
-      .order('events.date', { ascending: true });
+      .eq('song_id', song.id);
 
     if (error) {
       console.error('Error fetching events:', error);
       setEvents([]);
     } else {
       const flattened = data.map((row: any) => row.event_id).filter(Boolean);
+      flattened.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
       setEvents(flattened);
     }
   };
