@@ -273,7 +273,7 @@ export default function CalendarPage() {
                       })}
                     </div>
                   ) : (
-                    <div className="text-gray-400 italic">イベントなし</div>
+                    <div className="text-gray-400 italic">-</div>
                   )}
                 </div>
               </div>
