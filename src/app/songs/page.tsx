@@ -64,31 +64,40 @@ export default function SongsPage() {
   return (
     <div className="p-4 max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Gran☆Ciel 曲一覧</h1>
-      <table className="w-full text-sm border border-gray-300">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-2 border">曲名</th>
-            <th className="p-2 border">作詞</th>
-            <th className="p-2 border">作曲</th>
-            <th className="p-2 border">編曲</th>
-            <th className="p-2 border">振付</th>
-          </tr>
-        </thead>
-        <tbody>
-          {songs.map((song) => (
-            <tr key={song.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => handleClick(song)}>
-              <td className="p-2 border font-medium text-blue-600 underline">{song.title}</td>
-              <td className="p-2 border">{song.lyricist || '-'}</td>
-              <td className="p-2 border">{song.composer || '-'}</td>
-              <td className="p-2 border">{song.arranger || '-'}</td>
-              <td className="p-2 border">{song.choreographer || '-'}</td>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border border-gray-300 min-w-[400px]">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-2 border sticky left-0 bg-gray-100 z-10 min-w-[80px]">曲名</th>
+              <th className="p-2 border min-w-[80px]">作詞</th>
+              <th className="p-2 border min-w-[80px]">作曲</th>
+              <th className="p-2 border min-w-[80px]">編曲</th>
+              <th className="p-2 border min-w-[80px]">振付</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {songs.map((song) => (
+              <tr key={song.id} className="hover:bg-gray-50">
+                <td className="p-2 border font-medium text-blue-500 sticky left-0 bg-white z-10 cursor-pointer"
+                  onClick={() => handleClick(song)}>{song.title}</td>
+                <td className="p-2 border">{song.lyricist || '-'}</td>
+                <td className="p-2 border">{song.composer || '-'}</td>
+                <td className="p-2 border">{song.arranger || '-'}</td>
+                <td className="p-2 border">{song.choreographer || '-'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+      <Dialog open={open} onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen) {
+          setSelectedSong(null);
+          setEvents([]);
+        }
+      }}>
+        <DialogContent className="max-sm:w-96 max-sm:max-w-96">
           <DialogHeader>
             <DialogTitle>{selectedSong?.title}</DialogTitle>
           </DialogHeader>
@@ -96,32 +105,32 @@ export default function SongsPage() {
             <div className="text-sm space-y-2">
               <p><span className="font-medium">発売日:</span> {format(new Date(selectedSong.release_date), 'yyyy年M月d日')}</p>
               {selectedSong.notes && <p><span className="font-medium">備考:</span> {selectedSong.notes}</p>}
-              <div> 
-                {events.length > 0 && (  
-                    <div className="overflow-x-auto">  
-                    <table className="w-full text-sm border-collapse border border-gray-200">  
-                        <thead>  
-                        <tr className="bg-gray-50">  
-                            <th className="text-left py-2 px-3 border-b border-gray-200 font-medium">日付</th>  
-                            <th className="text-left py-2 px-3 border-b border-gray-200 font-medium">イベント名</th>  
-                            <th className="text-left py-2 px-3 border-b border-gray-200 font-medium">会場</th>  
-                        </tr>  
-                        </thead>  
-                        <tbody>  
-                        {events.map((event) => (  
-                            <tr key={event.id} className="hover:bg-gray-50">  
-                            <td className="py-2 px-3 border-b border-gray-100 whitespace-nowrap">  
-                                {format(new Date(event.date), 'yyyy年M月d日')}  
-                            </td>  
-                            <td className="py-2 px-3 border-b border-gray-100">{event.event_name}</td>  
-                            <td className="py-2 px-3 border-b border-gray-100">{event.location || '-'}</td>  
-                            </tr>  
-                        ))}  
-                        </tbody>  
-                    </table>  
-                    </div>  
-                )}  
-                </div>
+              <div>
+                {events.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs border-collapse border border-gray-100">
+                      <thead>
+                        <tr className="bg-gray-25">
+                          <th className="text-left py-1 px-2 border-b border-gray-100 font-normal text-gray-600">日付</th>
+                          <th className="text-left py-1 px-2 border-b border-gray-100 font-normal text-gray-600">イベント</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {events.map((event) => (
+                          <tr key={event.id} className="hover:bg-gray-25">
+                            <td className="py-1 px-2 border-b border-gray-50 whitespace-nowrap">
+                              {format(new Date(event.date), 'yyyy年M月d日')}
+                            </td>
+                            <td className="py-1 px-2 border-b border-gray-50">
+                              {event.event_name}<br /><span className="text-gray-500">@{event.location || '-'}</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </DialogContent>
