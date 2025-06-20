@@ -44,6 +44,23 @@ export default function ImportPage() {
 
     const isoDate = format(date, 'yyyy-MM-dd')
 
+    const { data: existingEvents, error: duplicateCheckError } = await supabase
+      .from('events')
+      .select('id')
+      .eq('event_name', eventName)
+      .eq('date', isoDate)
+
+    if (duplicateCheckError) {
+      console.error(duplicateCheckError)
+      setMessage('重複チェックに失敗しました')
+      return
+    }
+
+    if (existingEvents && existingEvents.length > 0) {
+      setMessage('すでに登録されています')
+      return
+    }
+
     // イベントを登録
     const { data: eventData, error: eventError } = await supabase
       .from('events')
