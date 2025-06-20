@@ -31,7 +31,7 @@ export default function SongsPage() {
 
   useEffect(() => {
     const fetchSongs = async () => {
-      const { data, error } = await supabase.from('songs').select('*').order('release_date', { ascending: true });
+      const { data, error } = await supabase.from('songs').select('*').order('release_date', { ascending: true }).order('id', { ascending: true });
       if (error) {
         console.error('Error fetching songs:', error);
       } else {
@@ -96,20 +96,32 @@ export default function SongsPage() {
             <div className="text-sm space-y-2">
               <p><span className="font-medium">発売日:</span> {format(new Date(selectedSong.release_date), 'yyyy年M月d日')}</p>
               {selectedSong.notes && <p><span className="font-medium">備考:</span> {selectedSong.notes}</p>}
-              <div>
-                <p className="font-medium mb-1">披露イベント:</p>
-                {events.length > 0 ? (
-                  <ul className="list-disc list-inside space-y-1">
-                    {events.map((event) => (
-                      <li key={event.id}>
-                        {format(new Date(event.date), 'yyyy年M月d日')} - {event.event_name}{event.location ? ` @ ${event.location}` : ''}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-gray-500">披露イベント情報が見つかりませんでした。</p>
-                )}
-              </div>
+              <div> 
+                {events.length > 0 && (  
+                    <div className="overflow-x-auto">  
+                    <table className="w-full text-sm border-collapse border border-gray-200">  
+                        <thead>  
+                        <tr className="bg-gray-50">  
+                            <th className="text-left py-2 px-3 border-b border-gray-200 font-medium">日付</th>  
+                            <th className="text-left py-2 px-3 border-b border-gray-200 font-medium">イベント名</th>  
+                            <th className="text-left py-2 px-3 border-b border-gray-200 font-medium">会場</th>  
+                        </tr>  
+                        </thead>  
+                        <tbody>  
+                        {events.map((event) => (  
+                            <tr key={event.id} className="hover:bg-gray-50">  
+                            <td className="py-2 px-3 border-b border-gray-100 whitespace-nowrap">  
+                                {format(new Date(event.date), 'yyyy年M月d日')}  
+                            </td>  
+                            <td className="py-2 px-3 border-b border-gray-100">{event.event_name}</td>  
+                            <td className="py-2 px-3 border-b border-gray-100">{event.location || '-'}</td>  
+                            </tr>  
+                        ))}  
+                        </tbody>  
+                    </table>  
+                    </div>  
+                )}  
+                </div>
             </div>
           )}
         </DialogContent>
