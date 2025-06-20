@@ -129,7 +129,7 @@ export default function Home() {
           <label className="block font-semibold">セットリスト（1行に1曲）</label>
           <textarea value={setlistText} onChange={(e) => setSetlistText(e.target.value)} className="w-full p-2 border rounded" rows={5} placeholder={`例：\n1. Answer\n2. True Love`} />
         </div>
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        <button type="submit" className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-700">
           登録
         </button>
       </form>

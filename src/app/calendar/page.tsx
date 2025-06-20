@@ -253,7 +253,7 @@ export default function CalendarPage() {
                             key={event.id}
                             className={`p-3 rounded-md cursor-pointer transition-colors ${
                               isClickable 
-                                ? 'text-blue-600 bg-blue-50 hover:bg-blue-100' 
+                                ? 'text-blue-500 bg-blue-50 hover:bg-blue-100' 
                                 : 'text-gray-700 bg-gray-50'
                             }`}
                             onClick={() => {
