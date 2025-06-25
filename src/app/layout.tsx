@@ -27,7 +27,6 @@ export default function RootLayout({
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [eventMenuOpen, setEventMenuOpen] = useState(false);
   const [musicMenuOpen, setMusicMenuOpen] = useState(false);
-  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
 
   return (
     <html lang="en">
