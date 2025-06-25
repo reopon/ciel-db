@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { format } from 'date-fns';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { format } from 'date-fns';
 
 interface Song {
   id: number;
@@ -23,23 +24,57 @@ interface Event {
   location?: string;
 }
 
-export default function SongsPage() {
-  const [songs, setSongs] = useState<Song[]>([]);
+interface LyricistGroup {
+  lyricist: string;
+  songs: Song[];
+}
+
+export default function LyricistsPage() {
+  const [lyricistGroups, setLyricistGroups] = useState<LyricistGroup[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const fetchSongs = async () => {
-      const { data, error } = await supabase.from('songs').select('*').order('release_date', { ascending: true }).order('id', { ascending: true });
+    const fetchSongsByLyricist = async () => {
+      const { data, error } = await supabase
+        .from('songs')
+        .select('*')
+        .order('lyricist', { ascending: true })
+        .order('release_date', { ascending: true });
+
       if (error) {
         console.error('Error fetching songs:', error);
-      } else {
-        setSongs(data || []);
+        setLoading(false);
+        return;
       }
+
+      // 作詞家別にグループ化  
+      const grouped = groupSongsByLyricist(data || []);
+      setLyricistGroups(grouped);
+      setLoading(false);
     };
-    fetchSongs();
+
+    fetchSongsByLyricist();
   }, []);
+
+  const groupSongsByLyricist = (songs: Song[]): LyricistGroup[] => {
+    const groups = new Map<string, Song[]>();
+
+    songs.forEach(song => {
+      const lyricist = song.lyricist || '作詞者不明';
+      if (!groups.has(lyricist)) {
+        groups.set(lyricist, []);
+      }
+      groups.get(lyricist)!.push(song);
+    });
+
+    return Array.from(groups.entries()).map(([lyricist, songs]) => ({
+      lyricist,
+      songs
+    }));
+  };
 
   const handleClick = async (song: Song) => {
     setSelectedSong(song);
@@ -61,33 +96,47 @@ export default function SongsPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="p-4 max-w-4xl mx-auto">
+        <p className="text-center">読み込み中...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-4 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Gran☆Ciel 曲一覧</h1>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm border border-gray-300 min-w-[400px]">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-2 border sticky left-0 bg-gray-100 z-10 min-w-[80px]">曲名</th>
-              <th className="p-2 border min-w-[80px]">作詞</th>
-              <th className="p-2 border min-w-[80px]">作曲</th>
-              <th className="p-2 border min-w-[80px]">編曲</th>
-              <th className="p-2 border min-w-[80px]">振付</th>
-            </tr>
-          </thead>
-          <tbody>
-            {songs.map((song) => (
-              <tr key={song.id} className="hover:bg-gray-50">
-                <td className="p-2 border font-medium text-blue-500 sticky left-0 bg-white z-10 cursor-pointer"
-                  onClick={() => handleClick(song)}>{song.title}</td>
-                <td className="p-2 border">{song.lyricist || '-'}</td>
-                <td className="p-2 border">{song.composer || '-'}</td>
-                <td className="p-2 border">{song.arranger || '-'}</td>
-                <td className="p-2 border">{song.choreographer || '-'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="p-4 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6">作詞家別楽曲一覧</h1>
+
+      <div className="space-y-6">
+        {lyricistGroups.map((group) => (
+          <Card key={group.lyricist}>
+            <CardHeader>
+              <CardTitle className="text-lg">
+                {group.lyricist} ({group.songs.length}曲)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                {group.songs.map((song) => (
+                  <div
+                    key={song.id}
+                    className="p-2 border rounded hover:bg-gray-50 cursor-pointer"
+                  >
+                    <div className="font-medium text-blue-500"
+                      onClick={() => handleClick(song)}
+                    >
+                      {song.title}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      作曲: {song.composer || '-'}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <Dialog open={open} onOpenChange={(isOpen) => {
@@ -135,6 +184,7 @@ export default function SongsPage() {
           )}
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }

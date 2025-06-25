@@ -186,8 +186,8 @@ export default function EventListPage() {
   }
 
   return (
-    <main className="max-w-4xl mx-auto mt-10 p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-center mb-8">Gran☆Ciel</h1>
+    <main className="max-w-4xl mx-auto p-6 space-y-6">
+      <h1 className="text-2xl font-bold text-center">Gran☆Ciel Event List</h1>
 
       {events.length === 0 ? (
         <div className="text-center text-gray-600">
