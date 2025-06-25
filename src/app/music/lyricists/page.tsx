@@ -3,26 +3,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { format } from 'date-fns';
-
-interface Song {
-  id: number;
-  title: string;
-  release_date: string;
-  lyricist: string | null;
-  composer: string | null;
-  arranger: string | null;
-  choreographer: string | null;
-  notes: string | null;
-}
-
-interface Event {
-  id: number;
-  event_name: string;
-  date: string;
-  location?: string;
-}
+import { Song } from '@/lib/types'
+import { SongDetailDialog } from '@/components/SongDetailDialog'
 
 interface LyricistGroup {
   lyricist: string;
@@ -33,7 +15,6 @@ export default function LyricistsPage() {
   const [lyricistGroups, setLyricistGroups] = useState<LyricistGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
-  const [events, setEvents] = useState<Event[]>([]);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -76,24 +57,9 @@ export default function LyricistsPage() {
     }));
   };
 
-  const handleClick = async (song: Song) => {
+  const handleClick = (song: Song) => {
     setSelectedSong(song);
     setOpen(true);
-
-    const { data, error } = await supabase
-      .from('setlists')
-      .select('event_id(id, event_name, date, location)')
-      .eq('song_id', song.id);
-
-    if (error) {
-      console.error('Error fetching events:', error);
-      setEvents([]);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const flattened = data.map((row: any) => row.event_id).filter(Boolean);
-      flattened.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      setEvents(flattened);
-    }
   };
 
   if (loading) {
@@ -139,51 +105,16 @@ export default function LyricistsPage() {
         ))}
       </div>
 
-      <Dialog open={open} onOpenChange={(isOpen) => {
-        setOpen(isOpen);
-        if (!isOpen) {
-          setSelectedSong(null);
-          setEvents([]);
-        }
-      }}>
-        <DialogContent className="max-sm:w-96 max-sm:max-w-96">
-          <DialogHeader>
-            <DialogTitle>{selectedSong?.title}</DialogTitle>
-          </DialogHeader>
-          {selectedSong && (
-            <div className="text-sm space-y-2">
-              <p><span className="font-medium">発売日:</span> {format(new Date(selectedSong.release_date), 'yyyy年M月d日')}</p>
-              {selectedSong.notes && <p><span className="font-medium">備考:</span> {selectedSong.notes}</p>}
-              <div>
-                {events.length > 0 && (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs border-collapse border border-gray-100">
-                      <thead>
-                        <tr className="bg-gray-25">
-                          <th className="text-left py-1 px-2 border-b border-gray-100 font-normal text-gray-600">日付</th>
-                          <th className="text-left py-1 px-2 border-b border-gray-100 font-normal text-gray-600">イベント</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {events.map((event) => (
-                          <tr key={event.id} className="hover:bg-gray-25">
-                            <td className="py-1 px-2 border-b border-gray-50 whitespace-nowrap">
-                              {format(new Date(event.date), 'yyyy年M月d日')}
-                            </td>
-                            <td className="py-1 px-2 border-b border-gray-50">
-                              {event.event_name}<br /><span className="text-gray-500">@{event.location || '-'}</span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <SongDetailDialog 
+        song={selectedSong}
+        open={open}
+        onOpenChange={(isOpen) => {
+          setOpen(isOpen);
+          if (!isOpen) {
+            setSelectedSong(null);
+          }
+        }}
+      />
 
     </div>
   );
