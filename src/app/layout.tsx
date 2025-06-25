@@ -61,6 +61,9 @@ export default function RootLayout({
                     <Link href="/music/composers" className="block px-4 py-2 hover:bg-gray-100">作曲家別</Link>
                   </div>
                 </div>
+
+                {/* About */}
+                <Link href="/about" className="hover:text-blue-600">About</Link>
               </div>
 
               {/* ハンバーガーボタン */}
@@ -113,6 +116,11 @@ export default function RootLayout({
                         <Link href="/music/composers" className="block p-2 hover:bg-gray-100 rounded">作曲家別</Link>
                       </div>
                     )}
+                  </div>
+
+                  {/* About */}
+                  <div>
+                    <Link href="/about" className="block p-2 hover:bg-gray-100 rounded">About</Link>
                   </div>
                 </div>
               </div>
