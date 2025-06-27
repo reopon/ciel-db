@@ -24,17 +24,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [eventMenuOpen, setEventMenuOpen] = useState(false);
   const [musicMenuOpen, setMusicMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const closeMenu = () => {
     setIsMenuOpen(false)
-    setEventMenuOpen(false)
     setMusicMenuOpen(false)
   }
 
