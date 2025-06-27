@@ -191,7 +191,7 @@ export default function CalendarPage() {
 
   return (
     <main className="max-w-4xl mx-auto p-6 space-y-8">
-      <h1 className="text-2xl font-bold text-center mb-6">Gran☆Ciel Calendar</h1>
+      <h1 className="text-2xl font-bold text-center mb-6">Gran☆Ciel Setlists</h1>
 
       <div className="space-y-6">
         <div className="flex items-center justify-between bg-white rounded-lg border shadow-sm p-4">
