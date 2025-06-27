@@ -1,7 +1,7 @@
 'use client'
 
 import { Geist, Geist_Mono } from "next/font/google";
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
