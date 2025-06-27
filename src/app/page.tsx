@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -28,18 +29,56 @@ interface Event {
   }>
 }
 
-export default function CalendarPage() {
+function CalendarPageContent() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [showEventModal, setShowEventModal] = useState(false)
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date())
+  
+  const getInitialMonth = () => {
+    const yearParam = searchParams.get('year')
+    const monthParam = searchParams.get('month')
+    
+    if (yearParam && monthParam) {
+      const year = parseInt(yearParam, 10)
+      const month = parseInt(monthParam, 10) - 1
+      
+      if (!isNaN(year) && !isNaN(month) && month >= 0 && month <= 11) {
+        return new Date(year, month, 1)
+      }
+    }
+    
+    return new Date()
+  }
+  
+  const [currentMonth, setCurrentMonth] = useState<Date>(getInitialMonth())
   const [eventsByDate, setEventsByDate] = useState<{ [key: string]: Event[] }>({})
 
   useEffect(() => {
     fetchEvents()
   }, [])
+
+  useEffect(() => {
+    const yearParam = searchParams.get('year')
+    const monthParam = searchParams.get('month')
+    
+    if (yearParam && monthParam) {
+      const year = parseInt(yearParam, 10)
+      const month = parseInt(monthParam, 10) - 1
+      
+      if (!isNaN(year) && !isNaN(month) && month >= 0 && month <= 11) {
+        const newMonth = new Date(year, month, 1)
+        if (newMonth.getTime() !== currentMonth.getTime()) {
+          setCurrentMonth(newMonth)
+        }
+      }
+    }
+  }, [searchParams, currentMonth])
 
   useEffect(() => {
     const dateMap: { [key: string]: Event[] } = {}
@@ -154,12 +193,25 @@ export default function CalendarPage() {
     return days
   }
 
+  const updateURL = (date: Date) => {
+    const year = date.getFullYear()
+    const month = date.getMonth() + 1
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('year', year.toString())
+    params.set('month', month.toString())
+    router.push(`${pathname}?${params.toString()}`)
+  }
+
   const goToPreviousMonth = () => {
-    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))
+    const newMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
+    setCurrentMonth(newMonth)
+    updateURL(newMonth)
   }
 
   const goToNextMonth = () => {
-    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))
+    const newMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
+    setCurrentMonth(newMonth)
+    updateURL(newMonth)
   }
 
   const formatMonthYear = (date: Date) => {
@@ -344,5 +396,13 @@ export default function CalendarPage() {
         </DialogContent>
       </Dialog>
     </main>
+  )
+}
+
+export default function CalendarPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center min-h-screen">カレンダーを読み込み中...</div>}>
+      <CalendarPageContent />
+    </Suspense>
   )
 }
