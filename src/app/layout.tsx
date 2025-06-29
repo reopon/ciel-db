@@ -7,6 +7,7 @@ import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import "./globals.css";
 import { ChevronDownIcon } from 'lucide-react'
+import { useEventMonths } from '@/hooks/useEventMonths'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,6 +27,7 @@ export default function RootLayout({
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [musicMenuOpen, setMusicMenuOpen] = useState(false);
   const [calendarMenuOpen, setCalendarMenuOpen] = useState(false);
+  const { eventMonths, loading } = useEventMonths()
 
   const closeMenu = () => {
     setIsMenuOpen(false)
@@ -50,18 +52,22 @@ export default function RootLayout({
                     <ChevronDownIcon className="ml-1 h-4 w-4" />
                   </button>
                   <div className="absolute top-full left-0 mt-1 w-48 bg-white border rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 max-h-64 overflow-y-auto">
-                    <Link href="/?year=2025&month=1" className="block px-4 py-2 hover:bg-gray-100" onClick={closeMenu}>2025年1月</Link>
-                    <Link href="/?year=2025&month=2" className="block px-4 py-2 hover:bg-gray-100" onClick={closeMenu}>2月</Link>
-                    <Link href="/?year=2025&month=3" className="block px-4 py-2 hover:bg-gray-100" onClick={closeMenu}>3月</Link>
-                    <Link href="/?year=2025&month=4" className="block px-4 py-2 hover:bg-gray-100" onClick={closeMenu}>4月</Link>
-                    <Link href="/?year=2025&month=5" className="block px-4 py-2 hover:bg-gray-100" onClick={closeMenu}>5月</Link>
-                    <Link href="/?year=2025&month=6" className="block px-4 py-2 hover:bg-gray-100" onClick={closeMenu}>6月</Link>
-                    <Link href="/?year=2025&month=7" className="block px-4 py-2 hover:bg-gray-100" onClick={closeMenu}>7月</Link>
-                    <Link href="/?year=2025&month=8" className="block px-4 py-2 hover:bg-gray-100" onClick={closeMenu}>8月</Link>
-                    <Link href="/?year=2025&month=9" className="block px-4 py-2 hover:bg-gray-100" onClick={closeMenu}>9月</Link>
-                    <Link href="/?year=2025&month=10" className="block px-4 py-2 hover:bg-gray-100" onClick={closeMenu}>10月</Link>
-                    <Link href="/?year=2025&month=11" className="block px-4 py-2 hover:bg-gray-100" onClick={closeMenu}>11月</Link>
-                    <Link href="/?year=2025&month=12" className="block px-4 py-2 hover:bg-gray-100" onClick={closeMenu}>12月</Link>
+                    {loading ? (
+                      <div className="px-4 py-2 text-gray-500">読み込み中...</div>
+                    ) : eventMonths.length > 0 ? (
+                      eventMonths.map((month) => (
+                        <Link 
+                          key={`${month.year}-${month.month}`}
+                          href={month.url} 
+                          className="block px-4 py-2 hover:bg-gray-100" 
+                          onClick={closeMenu}
+                        >
+                          {month.label}
+                        </Link>
+                      ))
+                    ) : (
+                      <div className="px-4 py-2 text-gray-500">イベントがありません</div>
+                    )}
                   </div>
                 </div>
 
@@ -109,18 +115,22 @@ export default function RootLayout({
                     </button>
                     {calendarMenuOpen && (
                       <div className="ml-4 space-y-1 max-h-48 overflow-y-auto">
-                        <Link href="/?year=2025&month=1" className="block p-2 hover:bg-gray-100 rounded" onClick={closeMenu}>2025年1月</Link>
-                        <Link href="/?year=2025&month=2" className="block p-2 hover:bg-gray-100 rounded" onClick={closeMenu}>2月</Link>
-                        <Link href="/?year=2025&month=3" className="block p-2 hover:bg-gray-100 rounded" onClick={closeMenu}>3月</Link>
-                        <Link href="/?year=2025&month=4" className="block p-2 hover:bg-gray-100 rounded" onClick={closeMenu}>4月</Link>
-                        <Link href="/?year=2025&month=5" className="block p-2 hover:bg-gray-100 rounded" onClick={closeMenu}>5月</Link>
-                        <Link href="/?year=2025&month=6" className="block p-2 hover:bg-gray-100 rounded" onClick={closeMenu}>6月</Link>
-                        <Link href="/?year=2025&month=7" className="block p-2 hover:bg-gray-100 rounded" onClick={closeMenu}>7月</Link>
-                        <Link href="/?year=2025&month=8" className="block p-2 hover:bg-gray-100 rounded" onClick={closeMenu}>8月</Link>
-                        <Link href="/?year=2025&month=9" className="block p-2 hover:bg-gray-100 rounded" onClick={closeMenu}>9月</Link>
-                        <Link href="/?year=2025&month=10" className="block p-2 hover:bg-gray-100 rounded" onClick={closeMenu}>10月</Link>
-                        <Link href="/?year=2025&month=11" className="block p-2 hover:bg-gray-100 rounded" onClick={closeMenu}>11月</Link>
-                        <Link href="/?year=2025&month=12" className="block p-2 hover:bg-gray-100 rounded" onClick={closeMenu}>12月</Link>
+                        {loading ? (
+                          <div className="p-2 text-gray-500">読み込み中...</div>
+                        ) : eventMonths.length > 0 ? (
+                          eventMonths.map((month) => (
+                            <Link 
+                              key={`mobile-${month.year}-${month.month}`}
+                              href={month.url} 
+                              className="block p-2 hover:bg-gray-100 rounded" 
+                              onClick={closeMenu}
+                            >
+                              {month.label}
+                            </Link>
+                          ))
+                        ) : (
+                          <div className="p-2 text-gray-500">イベントがありません</div>
+                        )}
                       </div>
                     )}
                   </div>
