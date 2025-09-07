@@ -370,7 +370,10 @@ function CalendarPageContent() {
                             {setlist.item_type === 'song' && (
                               <span>{setlist.song?.title}</span>
                             )}
-                            {setlist.notes && (
+                            {setlist.item_type === 'other' && setlist.notes && (
+                              <span className="text-gray-600 italic">{setlist.notes}</span>
+                            )}
+                            {setlist.notes && setlist.item_type === 'song' && (
                               <span className="ml-2 text-gray-500 text-sm">
                                 {setlist.notes}
                               </span>
@@ -383,14 +386,31 @@ function CalendarPageContent() {
                 </div>
               )}
 
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full mt-4"
-                onClick={() => setShowEventModal(false)}
-              >
-                閉じる
-              </Button>
+              <div className="flex gap-2 mt-4 pt-4 border-t">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => {
+                    const url = `${window.location.origin}/setlist/${selectedEvent.id}`
+                    navigator.clipboard.writeText(url).then(() => {
+                      console.log('リンクをコピーしました')
+                    }).catch(() => {
+                      console.log('リンクのコピーに失敗しました')
+                    })
+                  }}
+                >
+                  リンクをコピー
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setShowEventModal(false)}
+                >
+                  閉じる
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
