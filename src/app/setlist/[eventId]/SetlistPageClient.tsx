@@ -90,12 +90,12 @@ export default function SetlistPageClient({ eventId }: SetlistPageClientProps) {
             order: number
             item_type: string
             notes?: string
-            songs?: Song | null
+            songs?: Song[]
           }) => ({
             order: setlist.order,
             item_type: setlist.item_type,
             notes: setlist.notes,
-            song: setlist.songs
+            song: setlist.songs && setlist.songs.length > 0 ? setlist.songs[0] : null
           }))
           .sort((a, b) => a.order - b.order)
       }
