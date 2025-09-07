@@ -44,8 +44,8 @@ export async function generateMetadata({ params }: { params: Promise<{ eventId: 
     const setlistPreview = eventData.setlists
       ?.sort((a: { order: number }, b: { order: number }) => a.order - b.order)
       ?.slice(0, 5)
-      ?.map((setlist: { item_type: string; songs?: { title: string }; notes?: string }) => 
-        setlist.item_type === 'song' ? setlist.songs?.title : setlist.notes
+      ?.map((setlist: { item_type: string; songs?: { title: string }[]; notes?: string }) => 
+        setlist.item_type === 'song' ? (setlist.songs && setlist.songs.length > 0 ? setlist.songs[0].title : null) : setlist.notes
       )
       ?.filter(Boolean)
       ?.join(', ') || ''
